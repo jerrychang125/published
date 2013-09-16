@@ -1,0 +1,53 @@
+ITSBN_2 is developed based on ITSBN. In this new toolbox, most of the functions are not majorly modified. I added superpixel algorithm by Mori's into this toolbox. The function is "fn_SuperpixelMori1.m". So before using this ITSBN_2 toolbox, we need to install Mori's superpixel algorithm first.
+
+In this version, I deleted all unnecessary files so that it's not confusing.
+
+2.0.2: comments added on many files, so it's easier to understand. Also have some document on the code separately.
+
+2.1.0 The biggest change from 2.0.2 is that 2.1.0 does not use H(0), so we
+don't have to make identity matrix CPT between H(0) and H(1). 
+That is because we know that any discrete node can be soft evidence. This also prepare a more suitable structure/framework for the ITSBN that has evidence every level. There are major changes in the files 
+1)fn_makeTreeFromLabel.m: we don't export 'evidence_label', but instead export 'node_label_hier'. We also don't compute the node label for H(0) since we will not use it in the next process. 
+2) fn_ITSBNImageSegm.m: The network structure is composed of discrete variable only
+
+2.1.3
+The major changes on this version of the code is the stability and the clean comments on the fn_ITSBNImageSegm.m. Some plotting routines are moved to external script so that the main code is easier to read.
+
+2.1.4
+The main change is that this code is much cleaner. A lot of code chunks in the fn_ITSBNImageSegm.m have been taken away as separated scripts:
+script_GMMCalculatePosterior.m
+script_calculateCostFuncF.m
+script_constructITSBN.m
+script_ITSBNParameterLearning.m
+script_plottingResult.m
+This makes the code very readable and easy to maintainance.
+
+2.2.0
+The main code main_ITSBNImgSegm.m is cleaned thoroughly. All comments are made pretty clear. The image list file filters out non-image extensions and keep only image filenames.
+Several functions have been modified a bit so that the main code can take on any type of image '.jpg', '.bmp'. (Previously, we had to change the extension of images manually when a new dataset is obtained.)
+
+2.3.0
+The major change is that nodes in different level/scale can have different number of image-class number. For example, there might be 5 and 3 classes in level H1 and H2 respectively. This is implemeted in the function 
+fn_ITSBNImageSegm2.m
+Note that the CPT phi_lvu is no longer a square matrix!!!, so we cannot use eye(C) to initialize the matrix!!! So we have to comeup with a pseudo identity, we develope the function
+fn_pseudoDiag.m 
+We also output segmentation results in different scale of the image. The segs becomes a cell array to store the resulting segmentation from each level of the tree. This way we can see the difference of segmentation in different scale. 
+Also, we plot the figures more artistic. We use the same way as we did in the MLSP paper.
+fn_segment2boundary.m
+fn_segment2avgcolor.m
+Bugs fixed#1: We found that Mori's superpixel code can occasionally cause the "skip" order to the indices of the superpixel. For instance, it gives 1, 2, 5, 6 instead of 1, 2, 3, 4. This can cause major errors in the code because 1) matrix Z relies heavily on the order of the nodes, and does not work at all with the skip order. 2) This can cause the confusion when assigning the indices to each superpixels. Fortunately, we fix this bug already by reordering the indices using the function:
+fn_regularizeIndices.m
+We put the reorder routine in the function fn_makeTreeFromLabel.m and it works! 
+We also develop novel code to visualize graph structure of ITSBN. This can give a better picture of ITSBN on how the segmentation works. The code is
+main_visualizeITSBNgraph.m
+We also improve the superpixel quality by developing a new superpixel function
+fn_SuperpixelMori2.m
+% This function is developed from the previous one fn_SuperpixelMori1.m
+% The main problem of the previous version is the secondary segmentation (N_sp3 and N_sp1) is
+% not quite convex resulting in undesireable weird-shaped superpixels. In
+% this function, we fix the problem by using only primary segmentation. So,
+% the trade-off might be the speed is a bit slower.
+We also have fn_overlayGTORGBND.m to overlay the groundtruth segmentation on the original image and the boundary image. This function give very good-looking figure in papers.
+We have the code main_superpixelExperiment.m to produce superpixel image for a single image. The code is very simple.
+The code main_visualizeGroundtruthandSuperpixel.m is used to visualize the groundtruth vs the superpixel and the original image. This code is very useful when you want to evaluate the good size of superpixel and the percentage of good superpixel used to train the model.
+

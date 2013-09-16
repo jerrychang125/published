@@ -1,0 +1,9 @@
+1) Install Mori's superpixel code
+2) Instral Bayes Net Toolbox
+3) Change paths and folders determined in "main_ITSBNImageSegm.m" and run the program.
+
+This is similar to ITSBN in my previous post 
+
+http://www.whatdafact.com/kittipat/?p=701
+
+except that this use Mori's superpixel which produces faster, smoother and more meaningful superpixels than QuickShift given the same number of superpixels.
